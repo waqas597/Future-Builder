@@ -8,22 +8,43 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
-  Future<int> futurebuilder() async {
-    return 0;
+  Future<DateTime> futurebuilder() async {
+    await Future.delayed(Duration(seconds: 5));
+    return DateTime.now();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Future builder'),
+        backgroundColor: Colors.blue,
+        title: Center(child: Text('Future builder')),
       ),
       body: Column(
         children: [
+          TextButton(
+              onPressed: () {
+                futurebuilder();
+                setState(() {});
+              },
+              child: Text('Click')),
           FutureBuilder(
             future: futurebuilder(),
             builder: (context, snapshot) {
-              return Text(snapshot.data.toString());
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator();
+              } else if (snapshot.connectionState == ConnectionState.done ||
+                  snapshot.connectionState == ConnectionState.active) {
+                if (snapshot.hasError) {
+                  return Text(snapshot.error.toString());
+                } else if (snapshot.hasData) {
+                  return Text(snapshot.data.toString());
+                } else {
+                  return Text('somthing went wrong');
+                }
+              } else {
+                return Text(snapshot.connectionState.toString());
+              }
             },
           )
         ],
